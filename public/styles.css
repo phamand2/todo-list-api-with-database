@@ -96,3 +96,8 @@ body {
   background-color: #c62828;
   color: #fff;
 }
+
+.checked {
+  text-decoration: line-through;
+  text-decoration-color: red;
+}

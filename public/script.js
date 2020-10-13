@@ -10,16 +10,39 @@ function getTodoHtml(todoData) {
   const html = `
       <li class="todo-item js-todo-item" data-id="${todoData.id}">
         <div class="todo-form">
-          <input type="text" class="todo-form-input js-todo-item-${todoData.id}" value="${todoData.name}" />
+          <input type="text" class="${todoData.complete ? 'checked': ''} todo-form-input js-todo-item-${todoData.id}" value="${todoData.name}" />
           <button class="todo-button save js-save-button" data-id="${todoData.id}" type="submit">Save</button>
         </div>
         <button class="todo-button delete js-delete-button" data-id="${todoData.id}" type="button">X</button>
+        <input class="check-button" type="checkbox" ${todoData.complete ? 'checked': ''} data-id="${todoData.id}">
       </li>
     `;
   // return the built string back to the invoking function
   return html;
 }
 
+
+  function checkTodo(id) {
+
+    // send a "PUT" request to '/api/todos/id' where 'id' is the id to delete.
+    // Set the 'body' of the request to an object that contains the todo text that should be updated
+    axios
+      .patch(`/api/todos/${id}/check`
+      )
+      // once the response comes back, run this arrow function, passing the response back through as 'response'
+      .then((response) => {
+        // update the field value to the response data that came back from the server
+        renderTodos()
+      })
+      // 'catch' any errors that happen with the request and run this function
+      .catch((error) => {
+        // see if the error has a message on the response and use that. If not, fall back to the default error.
+        const errorText = error.response.data.error || error;
+        // show an alert that contains a basic message, plus the error
+        alert('could not update todo:' + errorText);
+      });
+  }
+  
 /**
  * Get the Todo Data from the API and export. Displays an alert if there is an error.
  */
@@ -155,11 +178,11 @@ document.addEventListener('click', (e) => {
   }
 
   // check if the 'target' of the click was a delete button
-  if (e.target.classList.contains('js-save-button')) {
+  if (e.target.classList.contains('check-button')) {
     // find the id of the todo that is to be deleted using the 'data-id' attribute of the button
     const id = e.target.dataset.id;
     // pass the id to the `updateTodo()` function
-    updateTodo(id);
+    checkTodo(id);
   }
 });
 
